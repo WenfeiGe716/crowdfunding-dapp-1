@@ -3,8 +3,8 @@
     <a-card class="ant-card-shadow">
       <template #title>
         <h3>
-          所有众筹
-          <a-button style="float: right" @click="openModal" type="primary">发起众筹</a-button>
+          所有投票
+          <a-button style="float: right" @click="openModal" type="primary">发起投票</a-button>
         </h3>
       </template>
       <a-table :columns="columns" :loading="state.loading" :data-source="state.data">
@@ -16,19 +16,19 @@
             <template #icon>
               <check-circle-outlined />
             </template>
-            众筹成功
+            投票成功
           </a-tag>
           <a-tag color="processing" v-else-if="new Date(record.endTime * 1000) > new Date()" >
             <template #icon>
               <sync-outlined :spin="true" />
             </template>
-            正在众筹
+            正在投票
           </a-tag>
           <a-tag color="error" v-else>
             <template #icon>
               <close-circle-outlined />
             </template>
-            众筹失败
+            投票失败
           </a-tag>
         </template>
         <template #action="{text, record}">
@@ -39,7 +39,7 @@
 
     <Modal v-model:visible="isOpen">
       <a-card style="width: 600px; margin: 0 2em;" :body-style="{ overflowY: 'auto', maxHeight: '600px' }">
-        <template #title><h3 style="text-align: center">发起众筹</h3></template>
+        <template #title><h3 style="text-align: center">发起投票</h3></template>
         <create-form :model="model" :form="form" :fields="fields" />
       </a-card>
     </Modal>
@@ -61,17 +61,17 @@ const columns = [
   {
     dataIndex: 'title',
     key: 'title',
-    title: '众筹标题'
+    title: '投票标题'
   },
   {
-    title: '目标金额(eth)',
+    title: '目标数票(票)',
     dataIndex: 'goal',
     key: 'goal'
   },
   {
-    title: '目前金额(eth)',
-    dataIndex: 'amount',
-    key: 'amount'
+    title: '目前数票(票)',
+    dataIndex: 'count',
+    key: 'count'
   },
   {
     title: '结束时间',
@@ -110,11 +110,11 @@ export default defineComponent({
         state.loading = false;
       } catch (e) {
         console.log(e);
-        message.error('获取众筹失败!');
+        message.error('获取投票失败!');
       }
     }
 
-    async function openModal() { 
+    async function openModal() {
       model.account = await getAccount();
       isOpen.value = true;
     }
@@ -124,7 +124,8 @@ export default defineComponent({
       account: '',
       title: '',
       info: '',
-      amount: 0,
+      globalPeople: 0,
+      initiatorAmount: 0,
       date: null,
     })
 
@@ -150,9 +151,13 @@ export default defineComponent({
           trigger: 'blur'
         }
       },
-      amount: {
+      globalPeople: {
+        type:'number',
+        label:'投票人数(票)'
+      },
+      initiatorAmount: {
         type: 'number',
-        label: '金额',
+        label: '押金(ether)',
         min: 0
       },
       date: {
@@ -162,7 +167,7 @@ export default defineComponent({
     })
 
     const form = reactive<Form>({
-      submitHint: '发起众筹',
+      submitHint: '发起投票',
       cancelHint: '取消',
       cancel: () => {
         closeModal();
@@ -170,14 +175,14 @@ export default defineComponent({
       finish: async () => {
         const seconds = Math.ceil(new Date(model.date).getTime() / 1000);
         try {
-          const res = await newFunding(model.account, model.title, model.info, model.amount, seconds);
+          const res = await newFunding(model.account, model.initiatorAmount,model.title, model.info, model.globalPeople, seconds);
           console.log(res)
-          message.success('发起众筹成功')
+          message.success('发起投票成功')
           closeModal();
           fetchData();
         } catch(e) {
           console.log(e);
-          message.error('发起众筹失败')
+          message.error('发起投票失败')
         }
       }
     })

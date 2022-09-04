@@ -16,7 +16,12 @@ const routes: Array<RouteRecordRaw> = [
     path: '/funding/:id',
     name: 'funding',
     component: () => import('../views/Funding.vue')
-  }
+  },
+  {
+    path: '/myReward/:id',
+    name: 'myReward',
+    component: () => import('../views/MyReward.vue')
+  },
 ]
 
 const router = createRouter({

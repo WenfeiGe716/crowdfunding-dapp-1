@@ -1,6 +1,6 @@
 <template>
   <div>
-    <a-button type="primary" @click="openModal" v-if="account === data.initiator && data.success">发起使用请求</a-button>
+    <a-button type="primary" @click="openModal" v-if="data.success">发起提取请求</a-button>
     <a-table :loading="state.loading" :data-source="state.data" :columns="columns">
       <template #expandedRowRender="{ record }">
         <p style="margin: 0">
@@ -14,7 +14,7 @@
           </template>
           正在等待通过
         </a-tag>
-        <a-tag color="success" v-else-if="record.agreeAmount >= record.goal / 2">
+        <a-tag color="success" v-else-if="record.agreeCount >= record.goal / 2">
           <template #icon>
             <check-circle-outlined />
           </template>
@@ -40,7 +40,7 @@
 
     <Modal v-model:visible="isOpen">
       <a-card style="width: 600px; margin: 0 2em;" :body-style="{ overflowY: 'auto', maxHeight: '600px' }">
-        <template #title><h3 style="text-align: center">发起使用请求</h3></template>
+        <template #title><h3 style="text-align: center">发起提取请求</h3></template>
         <create-form :model="model" :form="form" :fields="fields" />
       </a-card>
     </Modal>
@@ -63,19 +63,24 @@ const columns = [
     title: '使用说明'
   },
   {
-    dataIndex: 'goal',
-    key: 'goal',
-    title: '使用金额(eth)'
+    dataIndex: 'amount',
+    key: 'amount',
+    title: '押金(eth)'
   },
   {
-    dataIndex: 'agreeAmount',
-    key: 'agreeAmount',
-    title: '同意请求数额(eth)'
+    dataIndex: 'agreeCount',
+    key: 'agreeCount',
+    title: '同意请求数'
   },
   {
-    dataIndex: 'disagree',
-    key: 'disagree',
-    title: '不同意请求数额(eth)'
+    dataIndex: 'disagreeCount',
+    key: 'disagreeCount',
+    title: '不同意请求数'
+  },
+  {
+    dataIndex: 'flag',
+    key: 'flag',
+    title: '我的投票'
   },
   {
     dataIndex: 'over',
@@ -134,7 +139,7 @@ export default defineComponent({
       },
       finish: async () => {
         try {
-          await newUse(props.id as number, model.goal, model.info);
+          await newUse(props.id as number, model.info);
           message.success('发起请求成功')
           fetchData();
           closeModal();

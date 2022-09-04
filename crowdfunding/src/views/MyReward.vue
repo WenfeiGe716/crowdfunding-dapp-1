@@ -3,46 +3,10 @@
     <a-card class="ant-card-shadow">
       <template #title>
         <h3>
-          我发起的
+          我的奖励
         </h3>
       </template>
-      <a-table :columns="columns" :loading="state.loading" :data-source="state.init">
-        <template #time="{text, record}">
-          {{new Date(text * 1000).toLocaleString()}}
-        </template>
-        <template #tag="{text, record}">
-          <a-tag color="success" v-if="record.success === true">
-            <template #icon>
-              <check-circle-outlined />
-            </template>
-            投票成功
-          </a-tag>
-          <a-tag color="processing" v-else-if="new Date(record.endTime * 1000) > new Date()" >
-            <template #icon>
-              <sync-outlined :spin="true" />
-            </template>
-            正在投票
-          </a-tag>
-          <a-tag color="error" v-else>
-            <template #icon>
-              <close-circle-outlined />
-            </template>
-            投票失败
-          </a-tag>
-        </template>
-        <template #action="{text, record}">
-          <a @click="clickFunding(record.index)">查看详情</a>
-        </template>
-      </a-table>
-    </a-card>
-
-    <a-card class="ant-card-shadow" style="margin-top: 1em;">
-      <template #title>
-        <h3>
-          我投票的
-        </h3>
-      </template>
-      <a-table :columns="columns" :loading="state.loading" :data-source="state.contr">
+      <a-table :columns="columns" :loading="state.loading" :data-source="state.data">
         <template #time="{text, record}">
           {{new Date(text * 1000).toLocaleString()}}
         </template>
@@ -79,10 +43,11 @@ import { defineComponent, ref, reactive } from 'vue';
 import Modal from '../components/base/modal.vue'
 import CreateForm from '../components/base/createForm.vue'
 import { Model, Fields, Form } from '../type/form'
-import { contract, getAccount, getAllFundings, Funding, newFunding, getMyFundings, addListener } from '../api/contract'
+import { contract, getAccount, getAllFundings, Funding, newFunding, addListener } from '../api/contract'
 import { message } from 'ant-design-vue'
 import { CheckCircleOutlined, SyncOutlined, CloseCircleOutlined } from '@ant-design/icons-vue'
 import { useRouter } from 'vue-router'
+
 
 const columns = [
   {
@@ -91,19 +56,14 @@ const columns = [
     title: '投票标题'
   },
   {
-    title: '目标票数(票)',
+    title: '目标数票(票)',
     dataIndex: 'goal',
     key: 'goal'
   },
   {
-    title: '目前票数(票)',
+    title: '目前数票(票)',
     dataIndex: 'count',
     key: 'count'
-  },
-  {
-    title: '我投票的押金',
-    dataIndex: 'myAmount',
-    key: 'amount'
   },
   {
     title: '结束时间',
@@ -122,37 +82,33 @@ const columns = [
     dataIndex: 'action',
     key: 'action',
     slots: { customRender: 'action' }
-  },
+  }
 ]
 
 export default defineComponent({
-  name: 'Myself',
+  name: 'Home',
   components: { Modal, CreateForm, CheckCircleOutlined, SyncOutlined, CloseCircleOutlined },
   setup() {
     const isOpen = ref<boolean>(false);
-    const state = reactive<{loading: boolean, init: Funding[], contr: Funding[]}>({
+    const state = reactive<{loading: boolean, data: Funding[]}>({
       loading: true,
-      init: [],
-      contr: []
+      data: []
     })
 
     async function fetchData() {
       state.loading = true;
       try {
-        const res = await getMyFundings();
-        console.log(res)
-        state.init = res.init
-        state.contr = res.contr
+        state.data = await getAllFundings();
         state.loading = false;
       } catch (e) {
         console.log(e);
-        message.error('获取投票失败!');
+        message.error('获取奖励失败!');
       }
     }
 
     const router = useRouter();
     const clickFunding = (index : number) => {
-      router.push(`/funding/${index}`)
+      router.push(`/myReward/${index}`)
     }
     addListener(fetchData)
     fetchData();

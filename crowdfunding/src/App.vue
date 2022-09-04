@@ -9,7 +9,6 @@
     <m-footer />
   </div>
 </template>
-
 <script lang="ts">
 import Header from "./components/header.vue";
 import fade from "./components/base/fade.vue"
@@ -17,10 +16,10 @@ import mFooter from "./components/footer.vue";
 import { defineComponent } from "vue";
 
 export default defineComponent({
-  components: { 
-    Header, 
-    fade, 
-    mFooter 
+  components: {
+    Header,
+    fade,
+    mFooter
   }
 });
 </script>

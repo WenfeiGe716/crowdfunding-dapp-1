@@ -23,15 +23,24 @@
         :disabled="field.disabled"
       />
       <a-input-number
-        v-if="field.type === 'number'"
-        v-model:value="model[name]"
-        :min="field.min"
-        :max="field.max"
-        style="width: 240px;"
-        :disabled="field.disabled"
-        :formatter="value => `Eth ${value}`"
-        :parser="value => value.replace(/Eth|\s/g, '')"
+          v-if="field.type === 'number'"
+          v-model:value="model[name]"
+          :min="field.min"
+          :max="field.max"
+          style="width: 240px;"
+          :disabled="field.disabled"
       />
+
+<!--      <a-input-number-->
+<!--          v-if="field.type === 'ethNumber'"-->
+<!--          v-model:value="model[name]"-->
+<!--          :min="field.min"-->
+<!--          :max="field.max"-->
+<!--          style="width: 240px;"-->
+<!--          :disabled="field.disabled"-->
+<!--          :formatter="value => `Eth ${value}`"-->
+<!--          :parser="value => value.replace(/Eth|\s/g, '')"-->
+<!--      />-->
       <a-textarea
         v-if="field.type === 'textarea'"
         v-model:value="model[name]"
